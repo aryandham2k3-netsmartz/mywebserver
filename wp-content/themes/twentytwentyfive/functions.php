@@ -167,5 +167,5 @@ endif;
 
 add_action('wp_footer', 'my_custom_footer_text');
 function my_custom_footer_text() {
-    echo "<div style='text-align:center; padding: 20px; background: #000; color: #fff;'>DEPLOYED VIA CI/CD BY ARYAN DHAM</div>";
+    echo "<div style='text-align:center; padding: 20px; background: #000; color: #fff;'>DEPLOYED VIA CI/CD BY ARYAN</div>";
 }
