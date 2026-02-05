@@ -165,7 +165,7 @@ if ( ! function_exists( 'twentytwentyfive_format_binding' ) ) :
 	}
 endif;
 
-add_action('wp_footer', 'my_custom_footer_text');
-function my_custom_footer_text() {
-    echo "<div style='text-align:center; padding: 20px; background: #000; color: #fff;'>DEPLOYED VIA CI/CD BY ARYAN</div>";
+add_action('wp_body_open', 'my_custom_header_text');
+function my_custom_header_text() {
+    echo "<div style='text-align:center; padding: 20px; background: #ff0000; color: #fff; position: fixed; top: 0; width: 100%; z-index: 9999;'>CI/CD LIVE: ARYAN'S SERVER</div>";
 }
