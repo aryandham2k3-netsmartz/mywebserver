@@ -1,5 +1,4 @@
 name: Production Deployment
-
 on:
   push:
     branches:
@@ -7,24 +6,17 @@ on:
 
 jobs:
   deploy:
-    name: Sync to Azure VM
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Transfer to Nginx
+      - name: Transfer to Azure
         uses: appleboy/scp-action@master
         with:
           host: ${{ secrets.AZURE_VM_IP }}
           username: ${{ secrets.AZURE_VM_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          # This grabs the index.html file specifically
           source: "index.html"
-          # This puts it exactly in /var/www/html/
           target: "/var/www/html"
-          # This ensures it doesn't create a folder named 'index.html'
-          strip_components: 0
-          # This overwrites existing files
           overwrite: true
