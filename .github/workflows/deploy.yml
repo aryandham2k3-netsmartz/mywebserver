@@ -1,0 +1,25 @@
+name: Production Deployment
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    name: Sync to Azure VM
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Transfer to Nginx
+        uses: appleboy/scp-action@master
+        with:
+          host: 51.57.82.211
+          username: azureuser
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: "."
+          target: "/var/www/html"
+          strip_components: 0
