@@ -1,5 +1,6 @@
 name: Production Deployment
 
+# 1. Trigger: Run this whenever I push to the main branch
 on:
   push:
     branches:
@@ -11,15 +12,22 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # 2. Get the code from my GitHub repo
       - name: Checkout Code
         uses: actions/checkout@v4
 
+      # 3. Use the Appleboy tool to move files via SSH
       - name: Transfer to Nginx
         uses: appleboy/scp-action@master
         with:
-          host: 51.57.82.211
-          username: azureuser
+          # These link to the Secrets you just made
+          host: ${{ secrets.AZURE_VM_IP }}
+          username: ${{ secrets.AZURE_VM_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
+          
+          # Move everything from my project folder
           source: "."
+          # Put it in the Nginx web folder on Azure
           target: "/var/www/html"
+          # Don't create extra subfolders, keep it clean
           strip_components: 0
