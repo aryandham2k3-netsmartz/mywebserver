@@ -1,4 +1,7 @@
 <?php
+echo "<div style='background: #0073aa; color: white; padding: 20px; text-align: center; font-family: sans-serif;'>";
+echo "<h1> CI/CD pipeline is live, build verified.</h1>";
+echo "</div>";
 /**
  * Front to the WordPress application. This file doesn't do anything, but loads
  * wp-blog-header.php which does and tells WordPress to load the theme.
