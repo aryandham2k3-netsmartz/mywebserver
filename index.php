@@ -1,19 +1,10 @@
 <?php
-echo "<div style='background: #0073aa; color: white; padding: 20px; text-align: center; font-family: sans-serif;'>";
-echo "<h1> CI/CD pipeline is live, build verified.</h1>";
+// 1. CI/CD BANNER
+echo "<div style='background: #0073aa; color: white; padding: 20px; text-align: center; font-family: sans-serif; font-weight: bold; position: relative; z-index: 9999;'>";
+echo "🚀 CI/CD Pipeline is LIVE! Build Verified.";
 echo "</div>";
-/**
- * Front to the WordPress application. This file doesn't do anything, but loads
- * wp-blog-header.php which does and tells WordPress to load the theme.
- *
- * @package WordPress
- */
 
-/**
- * Tells WordPress to load the WordPress theme and output it.
- *
- * @var bool
- */
+// 2. wordpress
 define( 'WP_USE_THEMES', true );
 
 /** Loads the WordPress Environment and Template */
