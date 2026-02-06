@@ -17,12 +17,9 @@ jobs:
           host: ${{ secrets.AZURE_VM_IP }}
           username: ${{ secrets.AZURE_VM_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-         script: |
+          script: |
             cd ~/mywebserver
-            # Forcing the VM to match GitHub exactly
             git fetch --all
             git reset --hard origin/main
-            
-            # Restart Docker
-            sudo docker-compose down
-            sudo docker-compose up -d --build 
+            docker-compose down || true
+            docker-compose up -d --build
