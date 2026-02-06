@@ -1,17 +1,36 @@
-name: Docker CI/CD
+name: Docker CI/CD (Image-based)
 
 on:
   push:
     branches: [ main ]
 
 jobs:
-  deploy:
+  # JOB 1: Build the image on GitHub's computers and send to Docker Hub
+  build-and-push:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Deploy to Azure via SSH
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          push: true
+          tags: aryandham2k3/my-wp-site:latest
+
+  # JOB 2: Telling the Azure VM to download the new image and restart
+  deploy-to-azure:
+    needs: build-and-push # Wait for Job 1 to finish
+    runs-on: ubuntu-latest
+    steps:
+      - name: SSH and Update VM
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.AZURE_VM_IP }}
@@ -21,5 +40,7 @@ jobs:
             cd ~/mywebserver
             git fetch --all
             git reset --hard origin/main
-            docker-compose down || true
-            docker-compose up -d --build
+            # Pull the new image from Docker Hub
+            docker-compose pull wordpress
+            # Restart the site using the fresh image
+            docker-compose up -d
