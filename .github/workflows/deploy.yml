@@ -1,22 +1,25 @@
-name: WordPress Deployment
+name: Docker CI/CD
+
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-      - name: Transfer to Azure
-        uses: appleboy/scp-action@master
+      - name: Deploy to Azure via SSH
+        uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.AZURE_VM_IP }}
           username: ${{ secrets.AZURE_VM_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: "."
-          target: "/var/www/html"
-          strip_components: 0
-          overwrite: true
+          script: |
+            cd /home/azureuser/mywebserver
+            git pull origin main
+            # Clean restart to apply non-root user changes
+            docker-compose down
+            docker-compose up -d --build
