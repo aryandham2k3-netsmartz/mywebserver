@@ -5,7 +5,7 @@ on:
     branches: [ main ]
 
 jobs:
-  # JOB 1: Build the image on GitHub's computers and send to Docker Hub
+  # JOB 1: Build the image on GitHub and push to Docker Hub
   build-and-push:
     runs-on: ubuntu-latest
     steps:
@@ -23,14 +23,15 @@ jobs:
         with:
           context: .
           push: true
-          tags: aryandham2k3/my-wp-site:latest
 
-  # JOB 2: Telling the Azure VM to download the new image and restart
+          tags: aryandhamnetsmartz/my-wp-site:latest
+
+  # JOB 2: Tell the Azure VM to pull the new image and restart
   deploy-to-azure:
-    needs: build-and-push # Wait for Job 1 to finish
+    needs: build-and-push
     runs-on: ubuntu-latest
     steps:
-      - name: SSH and Update VM
+      - name: SSH into VM and Update
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.AZURE_VM_IP }}
@@ -38,9 +39,15 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             cd ~/mywebserver
+            # Sync the docker-compose.yml file from GitHub to VM
             git fetch --all
             git reset --hard origin/main
-            # Pull the new image from Docker Hub
+            
+            # Login to Docker Hub on the VM
+            echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+            
+            # Pull the fresh image we just pushed
             docker-compose pull wordpress
-            # Restart the site using the fresh image
-            docker-compose up -d
+            
+            # Restart only the wordpress container with the new image
+            docker-compose up -d wordpress
