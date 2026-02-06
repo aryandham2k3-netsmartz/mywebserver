@@ -1,11 +1,10 @@
-name: Docker CI/CD (Image-based)
+name: Docker CI/CD (Image-Based)
 
 on:
   push:
     branches: [ main ]
 
 jobs:
-  # JOB 1: Build the image on GitHub and push to Docker Hub
   build-and-push:
     runs-on: ubuntu-latest
     steps:
@@ -23,31 +22,33 @@ jobs:
         with:
           context: .
           push: true
-
           tags: aryandhamnetsmartz/my-wp-site:latest
 
-  # JOB 2: Tell the Azure VM to pull the new image and restart
   deploy-to-azure:
     needs: build-and-push
     runs-on: ubuntu-latest
     steps:
-      - name: SSH into VM and Update
+      - name: SSH and Update VM
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.AZURE_VM_IP }}
           username: ${{ secrets.AZURE_VM_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            cd ~/mywebserver
-            # Sync the docker-compose.yml file from GitHub to VM
-            git fetch --all
-            git reset --hard origin/main
+            cd ~/mywebserver || exit 1
             
-            # Login to Docker Hub on the VM
-            echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+            # Reset local changes to prevent git conflicts
+            sudo git fetch --all
+            sudo git reset --hard origin/main
             
-            # Pull the fresh image we just pushed
-            docker-compose pull wordpress
+            # Authenticate VM with Docker Hub to pull the new image
+            echo "${{ secrets.DOCKERHUB_TOKEN }}" | sudo docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
             
-            # Restart only the wordpress container with the new image
-            docker-compose up -d wordpress
+            # Pull the latest image
+            sudo docker-compose pull wordpress
+            
+            # Re-create the container with the new image
+            sudo docker-compose up -d wordpress
+            
+            # Cleanup old images to prevent disk full errors
+            sudo docker image prune -f
