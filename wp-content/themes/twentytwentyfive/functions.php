@@ -165,7 +165,7 @@ if ( ! function_exists( 'twentytwentyfive_format_binding' ) ) :
 	}
 endif;
 
-add_action('wp_body_open', 'my_custom_header_text');
-function my_custom_header_text() {
-    echo "<div style='text-align:center; padding: 20px; background: #ff0000; color: #fff; position: fixed; top: 0; width: 100%; z-index: 9999;'>CI/CD LIVE: ARYAN'S SERVER</div>";
+<div style="background: #0073aa; color: white; padding: 20px; text-align: center; font-family: sans-serif; font-weight: bold; width: 100%;">
+    CI/CD Pipeline is live Build Verified by Aryan Dham.
+</div>
 }
